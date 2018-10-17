@@ -21,10 +21,10 @@ items = np.random.uniform(low=MinWeight, high=MaxWeight, size=(n_items,))
 # Bag maximum capacity
 C = reduce(lambda x,y : x+y, items) / 2
 # Profits array for each item. The item index corresponds to its associated profit value
-profits = np.vectorize(lambda x: x + 5)(items)
+values = np.vectorize(lambda x: x + 5)(items)
 
 print("Item search space: %s" % items)
-print("Item profits %s" % profits)
+print("Item values %s" % values)
 print("Bag capacity: %i" % C)
 
 
@@ -70,19 +70,17 @@ def adjust_neighbours(vizinhos, C):
 
 def new_best_fit(new_solution, best_fit):
     """Compare the new solution with the current best"""
-    if (calculate_weights(profits, new_solution) > calculate_weights(profits, best_fit)):
+    if (calculate_weights(values, new_solution) > calculate_weights(values, best_fit)):
         return new_solution
     return best_fit
 
 
 def find_best_worst(neighbours):
     """Find the best and worst solution within a neighbourhood"""
-    tmp = [np.array(calculate_weights(profits, vizinho)) for vizinho in neighbours]
+    tmp = [np.array(calculate_weights(values, vizinho)) for vizinho in neighbours]
     return (neighbours[np.argmax(tmp)], neighbours[np.argmin(tmp)])
 
-#Atualiza a população de q-bits. A lista tabu é considerada dentro da função, durante o loop de aplicação das rotações.
-#A aplicação da porta quânica em um q-bit k qualquer é proibido de ser aplicado(tabu) caso ambos os bit k da melhor e pior
-#solução da iteração sejam, concomitantemente, 0 ou 1(Função xnor = 1 então é tabu).
+
 def updateQ(worst_sol, best_sol, qindividuals):
     """Update the qbits population applying the quantum gate on each qbit.
        The movement is not made for those qbits on the tabu list"""
@@ -116,7 +114,7 @@ print("Initial weight (without repair): %f" % calculate_weights(items, best_fit)
 best_fit = adjust_solution(best_fit, C)
 
 print("Initial weight (with repair): %f" % calculate_weights(items, best_fit))
-print("Initial profit (with repair): %f" % calculate_weights(profits, best_fit))
+print("Initial profit (with repair): %f" % calculate_weights(values, best_fit))
 
 start_time = time.time()
 
@@ -129,5 +127,5 @@ while i < NumIter:
     qindividuals = updateQ(best_solution, worst_solution, qindividuals)
 
 print("Running time : %.2f seconds" % (time.time() - start_time))
-print("Best solution profit %f" % calculate_weights(profits, best_fit))
+print("Best solution profit %f" % calculate_weights(values, best_fit))
 print("Best solution weight: %f" % calculate_weights(items, best_fit))
